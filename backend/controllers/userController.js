@@ -1,10 +1,10 @@
 import validator from 'validator'
 import bcrypt from 'bcrypt'
 import UserModel from "../models/userModel.js";
+import jwt from 'jsonwebtoken'
 
-
-const createToken = (id,role) => {
-   return  jwt.sign({id:id,role:role},process.env.JWT);
+const createToken = (id) => {
+   return  jwt.sign({id},process.env.JWT);
 }
 
 
@@ -70,17 +70,20 @@ const registerUser = async (res, req) =>{
 }
 
 
-const adminLogin = async (res, req) =>{
+const adminLogin = async (req, res) =>{
     try{
+        console.log('ri')
         const {email , password } = req.body;
         if(email === process.env.ADMIN_EMAIL && password === process.env.PASSWORD){
-            const token = createToken(email,role);
+            const token = createToken(email+password,process.env.JWT);
             res.json({sucess : true,token})
+        }else{
+            return res.json({sucess: false, msg : 'Invalid Credentials'}); 
         }
 
     }catch(err){
         console.log(err);
-         return res.json({sucess: false, msg : 'Invalid Credentials'});
+         return res.json({sucess: false,err});
     }
 }
 
