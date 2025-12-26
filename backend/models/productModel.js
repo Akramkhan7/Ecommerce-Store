@@ -34,12 +34,12 @@ const ProductSchema = new Schema({
     type: Boolean,
   },
   date: {
-    type: Number,
-    required: true,
+    type: Date,
   },
 });
 
-const productModel =
-  mongoose.product.model || mongoose.model("product", ProductSchema);
+
+  const productModel =
+  mongoose.models.product || mongoose.model("product", ProductSchema);
 
   export default productModel;
