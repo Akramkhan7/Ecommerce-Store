@@ -4,7 +4,11 @@ import UserModel from "../models/userModel.js";
 import jwt from 'jsonwebtoken'
 
 const createToken = (id) => {
-   return  jwt.sign({id},process.env.JWT);
+   return jwt.sign(
+  { isAdmin: true },
+  process.env.JWT_SECRET,
+  { expiresIn: "7d" }
+);
 }
 
 

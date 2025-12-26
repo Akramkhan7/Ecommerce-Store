@@ -22,14 +22,13 @@ app.use(
 connectDB();
 connectCloudinary();
 
-app.use(cors());
 app.use(express.json());
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
 app.use('/api/user',userRouter);
-app.use('api/product',productRouter);
+app.use('/api/product',productRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

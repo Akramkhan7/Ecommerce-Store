@@ -1,19 +1,30 @@
 import jwt from "jsonwebtoken";
 
-const adminAuth = (res, req, next) => {
+const adminAuth = (req, res, next) => {
   try {
-    const { token } = req.headers;
+    const token = req.headers && req.headers.token;
+    console.log(token);
     if (!token) {
-      res.json({ success: false, msg: "Not authorized Login again" });
+      return res.json({ success: false, msg: "Not authorized Login again" });
     }
-    const token_decode = jwt.verify(token, process.env.JWT);
-    if (token_decode !== process.env.ADMIN_EMAIL + process.env.PASSSWORD) {
-      res.json({ success: false, msg: "Not authorized Login again" });
+
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET not defined");
+    }
+
+    const token_decode = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(token_decode);
+    console.log(process.env.ADMIN_EMAIL + process.env.PASSWORD)
+
+    
+    if (token_decode.id !== process.env.ADMIN_EMAIL + process.env.PASSWORD) {
+      return res.json({ success: false, msg: "Not authorized Login again" });
+  
     }
     next();
   } catch (err) {
     console.log(err);
-    res.json({ success: false, err });
+    return res.json({ success: false, err });
   }
 };
 

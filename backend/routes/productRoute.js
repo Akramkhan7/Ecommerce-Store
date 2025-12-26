@@ -11,17 +11,20 @@ import adminAuth from "../middleware/adminAuth.js";
 const productRouter = express.Router();
 
 productRouter.post(
-  "/add",adminAuth,
-  upload.fields(
+  "/add",
+  upload.fields([
     { name: "image1", maxCount: 1 },
     { name: "image2", maxCount: 1 },
     { name: "image3", maxCount: 1 },
-    { name: "image4", maxCount: 1 }
-  ),
+    { name: "image4", maxCount: 1 },
+  ]),
+  adminAuth,
   addProduct
 );
+
+
 productRouter.post("/list", listProduct);
-productRouter.post("/remove",adminAuth, removeProduct);
+productRouter.post("/remove", adminAuth, removeProduct);
 productRouter.post("/single", singleProduct);
 
 export default productRouter;
