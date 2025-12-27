@@ -32,13 +32,16 @@ function Product() {
         {/* Product Images */}
         <div className="flex-1 flex flex-col-reverse gap-3 sm:flex-row">
           <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full">
-            {productData.image.map((item, index) => (
-              <img
-                onClick={() => setImage(item)}
-                src={item}
+            {productData?.sizes?.map((item, index) => (
+              <button
                 key={index}
-                className="w-[24%] sm:w-full sm:mb-3 shrink-0 cursor-pointer"
-              />
+                onClick={() => setSize(item)}
+                className={`py-2 px-4 bg-gray-100 cursor-pointer border 
+        ${item === size ? "border-orange-500" : "border-transparent"}
+      `}
+              >
+                {item}
+              </button>
             ))}
           </div>
 
@@ -72,22 +75,23 @@ function Product() {
           <div className="flex flex-col gap-4 my-8">
             <p>Select Size</p>
             <div className="flex gap-2">
-              {productData.sizes.map((item, index) => (
+              {productData?.sizes?.map((item, index) => (
                 <button
                   key={index}
                   onClick={() => setSize(item)}
                   className={`py-2 bg-gray-100 px-4 cursor-pointer ${
-                    item === size ? "border border-oran ge -500 " : ""
-                  } `}
+                    item === size ? "border border-orange-500" : ""
+                  }`}
                 >
                   {item}
                 </button>
               ))}
             </div>
           </div>
-          <button 
-          onClick={()=>(addToCart(productData._id,size))}
-          className="bg-black text-white py-3 px-8 cursor-pointer active:bg-gray-500">
+          <button
+            onClick={() => addToCart(productData._id, size)}
+            className="bg-black text-white py-3 px-8 cursor-pointer active:bg-gray-500"
+          >
             ADD TO CART
           </button>
           <hr className="mt-8 sm:w-4/5" />
