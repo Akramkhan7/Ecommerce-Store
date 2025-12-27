@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { assets } from "../assets/admin_assets/assets";
-import  {backendUrl}  from "../App";
+import { backendUrl } from "../App";
 import { toast } from "react-toastify";
 
 const Add = ({ token }) => {
@@ -32,10 +32,10 @@ const Add = ({ token }) => {
       formData.append("bestSeller", bestSeller);
       formData.append("sizes", JSON.stringify(sizes));
 
-      image1 &&  formData.append("image1", image1);
-      image2 &&  formData.append("image2", image2);
-      image3 &&  formData.append("image3", image3);
-      image4 &&  formData.append("image4", image4);
+      image1 && formData.append("image1", image1);
+      image2 && formData.append("image2", image2);
+      image3 && formData.append("image3", image3);
+      image4 && formData.append("image4", image4);
 
       const response = await axios.post(
         backendUrl + "/api/product/add",
@@ -46,27 +46,23 @@ const Add = ({ token }) => {
           },
         }
       );
+      console.log(response);
 
-      
-
-      if(response.data.success){
+      if (response.data.success) {
         toast.success(response.data.message);
-        setDescription('');
-        setName('');
-        
+        setDescription("");
+        setName("");
 
         setImage1(false);
         setImage2(false);
         setImage3(false);
         setImage4(false);
-      }else{
+        setPrice("");
+      } else {
         toast.error(response.data.message);
       }
-     
     } catch (error) {
-      
       console.log(error);
-      
     }
   };
 
@@ -172,9 +168,7 @@ const Add = ({ token }) => {
           >
             <p
               className={`px-3 py-1 cursor-pointer ${
-                sizes.includes(size)
-                  ? "bg-pink-200"
-                  : "bg-slate-200"
+                sizes.includes(size) ? "bg-pink-200" : "bg-slate-200"
               }`}
             >
               {size}
