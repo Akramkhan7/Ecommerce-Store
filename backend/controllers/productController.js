@@ -29,8 +29,6 @@ const addProduct = async (req, res) => {
         })
     );
 
-    console.log("img url", imageUrl);
-    console.log("img :", images);
     if (images.length === 0) {
       return res.status(400).json({
         success: false,
@@ -48,12 +46,14 @@ const addProduct = async (req, res) => {
       image: imageUrl,
       createdAt: Date.now(),
     };
-    console.log(productData);
-    const product = new productModel(productData);
-    console.log(product);
-    await product.save();
-    console.log(product);
 
+    console.log("product data is : ",productData);
+
+    const product = new productModel(productData);
+ 
+    await product.save();
+
+    console.log(product);
     return res.json({ success: true, msg: "Product Added" });
  
 };
@@ -78,7 +78,7 @@ const removeProduct = async (req, res) => {
   }
 };
 
-const singleProduct = async () => {
+const singleProduct = async (req,res) => {
   try {
     const { productId } = req.body;
     const product = await productModel.findById(productId);

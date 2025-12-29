@@ -1,13 +1,63 @@
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 import { useState } from 'react';
+import { ShopContext } from '../context/ShopContext';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useNavigate } from "react-router-dom";
+
 
 const Login = () => {
 
-  const [currentState, setCurrentState] = useState('Sign Up');
+  const {token, setToken, backendUrl} = useContext(ShopContext);
+  const [currentState, setCurrentState] = useState('Login');
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const navigate = useNavigate();
+
   const onSubmitHandler = async(e) =>{
     e.preventDefault();
-    console.log(e);
+    try{
+      if(currentState === 'Sign Up'){
+
+        const response = await axios.post(backendUrl + '/api/user/register', {email,password,name});
+        console.log(response.data);
+        if(response.data.success){
+          setToken(response.data.token);
+          localStorage.setItem("token",response.data.token)
+        }else{
+          toast.error(response.data.error)
+        }
+      }else{
+        const response = await axios.post(backendUrl + '/api/user/login', {email,password});
+        console.log("FULL RESPONSE:", response.data);
+console.log("SUCCESS VALUE:", response.data.success, typeof response.data.success);
+
+        console.log(response.data);
+
+         if(response.data.success){
+          setToken(response.data.token);
+          localStorage.setItem("token",response.data.token)
+          navigate("/");
+         
+         
+        }else{
+          toast.error(response.data.msg);   
+           console.log(" not Loging....")
+        }
+
+      }
+    }catch(err){
+      toast.error(err.message)
+      console.log(err);
+    }
   }
+
+  useEffect(()=>{
+    if(token){
+      navigate("/");
+    }
+  },[token])
 
   return (
     <form onSubmit={onSubmitHandler} className='flex flex-col items-center w-[90%] sm:max-w-96 m-auto mt-14 gap-4'>
@@ -21,19 +71,25 @@ const Login = () => {
         ''
       ) : (
         <input
+          onChange={(e)=>setName(e.target.value)}
           type="text"
           className='w-full px-3 py-2 border border-gray-800'
+          value={name}
           placeholder='Your Name'
         />
       )}
 
       <input
+        onChange={(e)=>setEmail(e.target.value)}
         type="email"
         className='w-full px-3 py-2 border border-gray-800'
+        value={email}
         placeholder='Email'
       />
 
       <input
+        value={password}
+        onChange={(e)=>setPassword(e.target.value)}
         type="password"
         className='w-full px-3 py-2 border border-gray-800'
         placeholder='Password'
@@ -59,7 +115,7 @@ const Login = () => {
         )}
       </div>
 
-      <button onClick={(e)=>onSubmitHandler(e.target)} className='bg-black text-white font-light px-8 py-2 mt-4'>
+      <button type='submit' className='bg-black text-white font-light px-8 py-2 mt-4 cursor-pointer'>
         {currentState}
       </button>
     </form>
