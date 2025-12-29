@@ -3,56 +3,65 @@ import bcrypt from 'bcrypt'
 import UserModel from "../models/userModel.js";
 import jwt from 'jsonwebtoken'
 
+// const createToken = (id) => {
+//    return jwt.sign(
+//   { isAdmin: true },
+//   process.env.JWT_SECRET,
+//   { expiresIn: "7d" }
+// );
+// }
+
 const createToken = (id) => {
-   return jwt.sign(
-  { isAdmin: true },
-  process.env.JWT_SECRET,
-  { expiresIn: "7d" }
-);
-}
+  return jwt.sign(
+    { id }, 
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+};
 
 
-const loginUser = async (res, req) =>{
+const loginUser = async (req, res) =>{
 
     try{
         const {email, password} = req.body;
-        const user = UserModel.findOne({email});
+        const user = await UserModel.findOne({email});
 
         if(!user){
-             return res.json({sucess: false, msg : 'User Does not Exists'})
+             return res.json({success: false, msg : 'User Does not Exists'})
         }
         const isMatch = await bcrypt.compare(password,user.password);
 
         if(isMatch){
-            const token = createToken(user_.id);
-            req.json({sucess : true, token});
+            const token = createToken(user._id);
+            res.json({success : true, token});
         }else{
-             return res.json({sucess: false, msg : 'Invalid Credentials'});
+            return res.json({success: false, msg : 'Invalid Credentials'});
         }
 
     }catch(err){
         console.log(err);
-         return res.json({sucess: false, msg : err.message});
+         return res.json({success: false, msg : err.message});
     }
 }
 
 
-const registerUser = async (res, req) =>{
+const registerUser = async (req, res) =>{
     try{
+        console.log("in register")
         const {name , email, password} = req.body;
 
-        const exists = await UserModel.find({email});
+        const exists = await UserModel.findOne({email});
 
         if(exists){
-            return res.json({sucess: false, msg : 'User Already Exists'})
+            return res.json({success: false, msg : 'User Already Exists'})
         }
 
         if(!validator.isEmail(email)){
-           return res.json({sucess: false, msg : 'Email Already Exists'})
+           return res.json({success: false, msg : 'Email Already Exists'})
         }
 
         if(password.length < 8){
-              return res.json({sucess: false, msg : 'Plese enter a strong password'})
+              return res.json({success: false, msg : 'Plese enter a strong password'})
         }
 
         const salt  = await bcrypt.genSalt(10);
@@ -65,29 +74,31 @@ const registerUser = async (res, req) =>{
         })
         const user  = await newUser.save();
         const token = createToken(user._id);
-        return res.json({sucess : true,token})
+        console.log(user)
+        console.log(token)
+        return res.json({success : true,token})
 
     }catch(err){
         console.log(err);
-         return res.json({sucess: false, msg : 'Something went wrong'});
+         return res.json({success: false, msg : 'Something went wrong'});
     }
 }
 
 
 const adminLogin = async (req, res) =>{
     try{
-        console.log('ri')
+        
         const {email , password } = req.body;
         if(email === process.env.ADMIN_EMAIL && password === process.env.PASSWORD){
-            const token = createToken(email+password,process.env.JWT);
-            res.json({sucess : true,token})
+            const token = createToken("admin");
+            res.json({success : true,token})
         }else{
-            return res.json({sucess: false, msg : 'Invalid Credentials'}); 
+            return res.json({success: false, msg : 'Invalid Credentials'}); 
         }
 
     }catch(err){
         console.log(err);
-         return res.json({sucess: false,err});
+         return res.json({success: false,err});
     }
 }
 

@@ -9,7 +9,7 @@ function Product() {
   const { products, currency, addToCart } = useContext(ShopContext);
   const [productData, setProductData] = useState(false);
   const [image, setImage] = useState("");
-  const [size, setSize] = useState("");
+  const [size, setSize] = useState('');
 
   const fetchProductData = async () => {
     const found = products.find((item) => item._id == productId);
@@ -25,6 +25,9 @@ function Product() {
     fetchProductData();
   }, [productId, products]);
 
+  console.log("Loaded Product:", productData);
+  console.log("Sizes:", productData?.sizes);
+
   return productData ? (
     <div className="border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100">
       {/* Product Data */}
@@ -32,13 +35,13 @@ function Product() {
         {/* Product Images */}
         <div className="flex-1 flex flex-col-reverse gap-3 sm:flex-row">
           <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full">
-            {productData?.sizes?.map((item, index) => (
+            {products?.sizes?.map((item) => (
               <button
-                key={index}
+                key={item}
                 onClick={() => setSize(item)}
-                className={`py-2 px-4 bg-gray-100 cursor-pointer border 
-        ${item === size ? "border-orange-500" : "border-transparent"}
-      `}
+                className={`py-2 px-4 cursor-pointer bg-gray-100
+                ${item === size ? "border border-orange-500" : ""}
+              `}
               >
                 {item}
               </button>
@@ -75,13 +78,12 @@ function Product() {
           <div className="flex flex-col gap-4 my-8">
             <p>Select Size</p>
             <div className="flex gap-2">
-              {productData?.sizes?.map((item, index) => (
+              {productData?.sizes?.map((item) => (
                 <button
-                  key={index}
+                  key={item}
                   onClick={() => setSize(item)}
-                  className={`py-2 bg-gray-100 px-4 cursor-pointer ${
-                    item === size ? "border border-orange-500" : ""
-                  }`}
+                  className={`py-2 px-4 bg-gray-100 cursor-pointer
+      ${item === size ? "border border-orange-500" : ""}`}
                 >
                   {item}
                 </button>
