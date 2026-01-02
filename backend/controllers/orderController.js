@@ -4,7 +4,8 @@ import UserModel from "../models/userModel.js";
 //Placing order through COD
 const placeOrder = async (req, res) => {
   try {
-    const { userId, items, amount, address } = req.body;
+    const { items, amount, address } = req.body;
+    const userId = req.userId;
     const orderData = {
       userId,
       items,
@@ -35,6 +36,7 @@ const allOrders = async (req, res) => {
   try {
     const orders = await orderModel.find({});
     res.json({ success: true, orders });
+    console.log("orders are :", orders)
   } catch (error) {
     console.log(error);
     res.json({ success: false, msg: error.message });
@@ -44,8 +46,8 @@ const allOrders = async (req, res) => {
 //User data for frontend
 const userOrders = async (req, res) => {
   try {
-    const { userId } = req.body;
-    const orders = await orderModel.findById({ userId });
+    const userId  = req.userId;
+    const orders = await orderModel.find({ userId });
     res.json({ success: true, orders });
   } catch (error) {
     console.log(error);
