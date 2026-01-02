@@ -3,10 +3,21 @@ import Title from "../components/Title";
 import CartTotal from "../components/CartTotal";
 import { assets } from "../assets/frontend_assets/assets";
 import { ShopContext } from "../context/ShopContext";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 function PlaceOrder() {
   const [method, setMethod] = useState("cod");
-  const { navigate } = useContext(ShopContext);
+  const {
+    navigate,
+    backendUrl,
+    token,
+    cartItems,
+    setCartItems,
+    getCartAmount,
+    delivery_fee,
+    products,
+  } = useContext(ShopContext);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -21,19 +32,67 @@ function PlaceOrder() {
   });
 
   const onChangeHandler = (e) => {
-    const name = e.target.value;
+    const name = e.target.name;
     const value = e.target.value;
 
     setFormData((data) => ({ ...data, [name]: value }));
   };
 
-  const onSubmitHandler = async(e) =>{
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
-    
-  }
+    try {
+      let orderItems = [];
+
+      for (const items in cartItems) {
+        for (const item in items) {
+          if (cartItems[items][item] > 0) {
+            const itemInfo = structuredClone(
+              products.find((product) => product._id == item)
+            );
+            if (itemInfo) {
+              itemInfo.size = item;
+              itemInfo.quantity = cartItems[items][item];
+              orderItems.push(itemInfo);
+            }
+            
+          }
+        }
+      }
+
+      const orderData = {
+        address: formData,
+        items: orderItems,
+        amount: getCartAmount() + delivery_fee,
+      };
+
+      if (method === "cod") {
+        try {
+          const res = await axios.post(
+            `${backendUrl}/api/order/place`,
+            orderData,
+            { headers: { token } }
+          );
+          console.log(res);
+          if (res.data.success) {
+            setCartItems({});
+            navigate("/orders");
+          } else {
+            toast.error(res.data.message);
+          }
+        } catch (error) {
+          toast.error("Something went wrong");
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
-    <form onSubmit={onSubmitHandler} className="flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh]">
+    <form
+      onSubmit={onSubmitHandler}
+      className="flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh]"
+    >
       {/* ------------- Left Side ------------- */}
       <div className="flex flex-col gap-4 w-full sm:max-w-[480px]">
         <div className="text-xl sm:text-2xl my-3">
