@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
 
 const authUser = (req, res, next) => {
-  const { token } = req.headers;
+  const { token } = req.headers.token;
   if (!token) {
-    return res.json({ success: false, msg: "Not Authorized Login again" });
+    return res.json({ success: false, msg: "Not Authorized Login againn" });
   }
   try {
     const token_decode = jwt.verify(token, process.env.JWT_SECRET);

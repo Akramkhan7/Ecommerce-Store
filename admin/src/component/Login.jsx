@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import {useNavigate} from 'react-router-dom'
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-const Login = ({setToken}) => {
 
+const Login = ({setToken}) => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -16,8 +18,10 @@ const Login = ({setToken}) => {
         `${backendUrl}/api/user/admin`,
         { email, password }
       );
-      if(response.data.sucess){
+      if(response.data.success){
         setToken(response.data.token)
+        navigate('/add')
+        console.log("redirecting")
       }else{
         toast.error(response.data.message)
       }
