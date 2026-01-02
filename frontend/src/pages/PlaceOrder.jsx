@@ -41,20 +41,29 @@ function PlaceOrder() {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     try {
+      const authToken = localStorage.getItem("token");
+
+      if (!authToken) {
+        toast.error("Please login first");
+        return;
+      }
+
       let orderItems = [];
 
-      for (const items in cartItems) {
-        for (const item in items) {
-          if (cartItems[items][item] > 0) {
-            const itemInfo = structuredClone(
-              products.find((product) => product._id == item)
-            );
-            if (itemInfo) {
-              itemInfo.size = item;
-              itemInfo.quantity = cartItems[items][item];
-              orderItems.push(itemInfo);
+      for (const productId in cartItems) {
+        for (const size in cartItems[productId]) {
+          if (cartItems[productId][size] > 0) {
+            const product = products.find((p) => p._id == productId);
+
+            console.log("Item info : ", product);
+
+            if (product) {
+              orderItems.push({
+                ...structuredClone(product),
+                size: size,
+                quantity: cartItems[productId][size],
+              });
             }
-            
           }
         }
       }
@@ -67,6 +76,8 @@ function PlaceOrder() {
 
       if (method === "cod") {
         try {
+          console.log("TOKEN:", token);
+
           const res = await axios.post(
             `${backendUrl}/api/order/place`,
             orderData,
