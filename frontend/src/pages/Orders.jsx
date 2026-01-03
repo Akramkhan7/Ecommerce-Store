@@ -18,24 +18,25 @@ const Orders = () => {
       {},
       { headers: { token } }
     );
-    console.log("items:", response.data.orders[0].items);
+
     if (response.data.success) {
       let allOrderItem = [];
       response.data.orders.map((order) => {
         order.items.map((item) => {
-          item["status"] = item.status;
-          item["payment"] = item.payment;
-          item["paymentMethod"] = item.paymentMethod;
-          item["date"] = item.date;
-
-          allOrderItem.push(item);
+         
+          allOrderItem.push({
+            ...item,
+            status : order.status,
+            paymentMethod : order.paymentMethod,
+            date : order.date,
+          })
         });
       });
 
       setOrderData(allOrderItem.reverse());
 
     }
-    console.log("after : ",response.data.orders.items);
+
 
   };
 
@@ -86,7 +87,8 @@ const Orders = () => {
               </div>
               <button
                 onClick={loadOrderData}
-                className="border px-4 py-2 text-sm font-medium rounded-sm "
+                className="border px-4 py-2 text-sm font-medium rounded-sm cursor-pointer"
+
               >
                 TRACK ORDER
               </button>
