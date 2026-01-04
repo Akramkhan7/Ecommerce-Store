@@ -76,14 +76,12 @@ function PlaceOrder() {
 
       if (method === "cod") {
         try {
-          console.log("TOKEN:", token);
-
           const res = await axios.post(
             `${backendUrl}/api/order/place`,
             orderData,
             { headers: { token } }
           );
-          console.log(res);
+
           if (res.data.success) {
             setCartItems({});
             navigate("/orders");
@@ -92,6 +90,18 @@ function PlaceOrder() {
           }
         } catch (error) {
           toast.error("Something went wrong");
+        }
+      } else if (method == "stripe") {
+        const res = await axios.post(
+          `${backendUrl}/api/order/stripe`,
+          orderData,
+          { headers: { token } }
+        );
+        if (res.data.success) {
+          window.location.replace(res.data.url); 
+        
+        } else {
+          toast.error(res.data.message);
         }
       }
     } catch (error) {

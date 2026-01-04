@@ -128,11 +128,17 @@ const ShopContextProvider = (props) => {
   }, []);
 
   useEffect(()=>{
-    if(!token && localStorage.getItem("token")){
-      setToken(localStorage.getItem("token"));
-      getUserCart(localStorage.getItem("token"))
+    const storeToken = localStorage.getItem('token')
+    if(storeToken && !token){
+      setToken(storeToken);
     }
-  })
+  },[])
+
+  useEffect(() => {
+  if (token) {
+    getUserCart(token); // ✅ restore cart after refresh
+  }
+}, [token]);
   const value = {
     products,
     currency,

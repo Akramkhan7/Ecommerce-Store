@@ -1,17 +1,22 @@
-import express from "express";
 import dotenv from "dotenv";
+dotenv.config(); // ✅ VERY FIRST
+
+import express from "express";
+import cors from "cors";
+
 import connectDB from "./config/mongodb.js";
 import connectCloudinary from "./config/cloudinary.js";
+
 import userRouter from "./routes/userRoute.js";
 import productRouter from "./routes/productRoute.js";
-import cors from "cors";
 import cartRouter from "./routes/cartRoutes.js";
 import orderRouter from "./routes/orderRoutes.js";
 
-dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+// Middleware
+app.use(express.json());
 app.use(
   cors({
     origin: true,
@@ -19,19 +24,19 @@ app.use(
   })
 );
 
+// DB & Cloudinary
 connectDB();
 connectCloudinary();
 
-app.use(express.json());
-app.get("/", (req, res) => {
-  res.send("API is running...");
-});
-
+// Routes
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
 
+
+// Server start
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(` Server running on port ${PORT}`);
+  console.log(" Stripe Key Loaded:", !!process.env.STRIPE_SECRET_KEY);
 });
