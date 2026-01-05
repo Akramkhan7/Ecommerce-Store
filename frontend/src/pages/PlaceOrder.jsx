@@ -38,6 +38,32 @@ function PlaceOrder() {
     setFormData((data) => ({ ...data, [name]: value }));
   };
 
+  const initPay = (order) =>{
+    const option ={
+      key : import.meta.env.VITE_AZORPAY_KEY_ID,
+      amount : order.amount,
+      currency : order.currency,
+      name : "Order payment",
+      order_id : order.id,
+      receipt : order.receipt,
+      handler : async (response) => {
+       try{
+        const {data} = await axios.post(backendUrl + '/api/order/verifyRazorpay',response,{headers:{token}})
+        if(data.success){
+          navigate("/orders");
+          setCartItems({})
+        }
+       }catch(error){
+        console.log(error);
+        toast.error(error.message)
+       }
+      }
+    }
+    const rzp = new window.Razorpay(option);
+    rzp.open();
+  }
+
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     try {
@@ -102,6 +128,11 @@ function PlaceOrder() {
         
         } else {
           toast.error(res.data.message);
+        }
+      }else{
+        const res = await axios.post(`${backendUrl}/api/order/razorpay`,orderData,{headers:{token}});
+        if(res.data.success){
+          initPay(res.data.order);
         }
       }
     } catch (error) {
