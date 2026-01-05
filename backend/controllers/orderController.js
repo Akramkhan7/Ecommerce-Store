@@ -1,11 +1,10 @@
-
 import orderModel from "../models/orderModel.js";
 import UserModel from "../models/userModel.js";
 import Stripe from "stripe";
+import Razorpay from "razorpay";
 
-
-const currency = 'inr';
-const delivery_charges = 10
+const currency = "inr";
+const delivery_charges = 10;
 
 //Payment Gateway
 
@@ -15,6 +14,17 @@ const getStripe = () => {
   }
   return new Stripe(process.env.STRIPE_SECRET_KEY);
 };
+
+const getRazorpay = () =>{
+  if(!process.env.RAZORPAY_SECRET_KEY || !process.env.RAZORPAY_KEY_ID){
+     throw new Error("Razorpay keys missing in env");
+  }
+  return new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_SECRET_KEY,
+});
+}
+
 
 
 //Placing order through COD
@@ -76,7 +86,6 @@ const stripeVerify = async (req, res) => {
   }
 };
 
-
 const placeOrderStripe = async (req, res) => {
   try {
     const stripe = getStripe();
@@ -122,24 +131,74 @@ const placeOrderStripe = async (req, res) => {
     });
 
     res.json({ success: true, url: session.url });
-
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, msg: error.message });
   }
 };
 
-
-
 //Placing order through Razorpay
-const placeOrderRazorpay = async (req, res) => {};
+const placeOrderRazorpay = async (req, res) => {
+  try {
+    const razorpayInstance = getRazorpay();
+    const { items, amount, address } = req.body;
+    const userId = req.userId;
 
+    const newOrder = new orderModel({
+      userId,
+      items,
+      amount,
+      address,
+      paymentMethod: "Razorpay",
+      payment: false,
+      date: Date.now(),
+    });
+
+    await newOrder.save();
+
+    // 2️⃣ Razorpay order options
+    const options = {
+      amount: (amount + delivery_charges) * 100, // paisa
+      currency: currency.toUpperCase(),
+      receipt: newOrder._id.toString(),
+    };
+
+    const razorpayOrder = await razorpayInstance.orders.create(options);
+    res.json({
+      success: true,
+      order: razorpayOrder,
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, msg: error.message });
+  }
+};
+
+
+//verify Razorpay
+const verifyRazorPay = async(req, res) =>{
+  try{
+     const razorpayInstance = getRazorpay();
+    const {userId, razorpay_order_id} = req.body;
+    const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id);
+    if(orderInfo.status === 'paid'){
+      await orderModel.findByIdAndUpdate(orderInfo.receipt, {payment : true});
+      await UserModel.findByIdAndUpdate(userId,{cartData : {}})
+      res.json({success : true, message : 'Payment Successful'});
+    }else{
+      res.json({success: false, message : error.message})
+    }
+
+  }catch(error){
+    console.log(error)
+  }
+}
 //All orders data for Admin
 const allOrders = async (req, res) => {
   try {
     const orders = await orderModel.find({});
     res.json({ success: true, orders });
-    console.log("orders are :", orders)
+    console.log("orders are :", orders);
   } catch (error) {
     console.log(error);
     res.json({ success: false, msg: error.message });
@@ -149,7 +208,7 @@ const allOrders = async (req, res) => {
 //User data for frontend
 const userOrders = async (req, res) => {
   try {
-    const userId  = req.userId;
+    const userId = req.userId;
     const orders = await orderModel.find({ userId });
     res.json({ success: true, orders });
   } catch (error) {
@@ -160,13 +219,12 @@ const userOrders = async (req, res) => {
 
 //Update order status from Admin Panel
 const updateStatus = async (req, res) => {
-  try{
+  try {
+    const { orderId, status } = req.body;
 
-    const {orderId, status} = req.body;
-
-    await orderModel.findByIdAndUpdate(orderId, {status});
-    res.json({ success: true, msg : "Status Updated" });
-  }catch(error){
+    await orderModel.findByIdAndUpdate(orderId, { status });
+    res.json({ success: true, msg: "Status Updated" });
+  } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
   }
@@ -180,4 +238,5 @@ export {
   userOrders,
   updateStatus,
   stripeVerify,
+  verifyRazorPay,
 };
