@@ -1,7 +1,7 @@
 import React from "react";
 import { assets } from "../assets/admin_assets/assets";
 
-function Navbar({ setToken }) {
+function Navbar({ setToken }) { //login
   return (
     <div className="flex items-center py-2 px-[4%] justify-between">
       <img className="w-36 " src={assets.logo} alt="" />
