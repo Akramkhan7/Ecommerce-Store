@@ -21,12 +21,11 @@ const Login = ({setToken}) => {
       if(response.data.success){
         setToken(response.data.token)
         navigate('/add')
-        console.log("redirecting")
+        
       }else{
         toast.error(response.data.message)
       }
 
-      console.log(response.data);
     } catch (err) {
       console.error(err);
       toast.error(err.message);
