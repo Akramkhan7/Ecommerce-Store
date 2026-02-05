@@ -12,7 +12,7 @@ const addProduct = async (req, res) => {
       sizes,
       bestSeller,
     } = req.body;
-
+ // for product controller
     const image1 = req.files?.image1?.[0] || null;
     const image2 = req.files?.image2?.[0] || null;
     const image3 = req.files?.image3?.[0] || null;
