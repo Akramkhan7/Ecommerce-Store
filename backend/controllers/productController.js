@@ -12,7 +12,7 @@ const addProduct = async (req, res) => {
       sizes,
       bestSeller,
     } = req.body;
- // for product controller
+
     const image1 = req.files?.image1?.[0] || null;
     const image2 = req.files?.image2?.[0] || null;
     const image3 = req.files?.image3?.[0] || null;
@@ -48,19 +48,14 @@ const addProduct = async (req, res) => {
     };
 
     const product = new productModel(productData);
- 
     await product.save();
-
-    console.log(product);
     return res.json({ success: true, msg: "Product Added" });
  
 };
 
 const listProduct = async (req, res) => {
   try {
-    const products = await productModel.find({});
-    console.log(products)
-  
+    const products = await productModel.find({});  
    return res.json({ success: true, products });
   } catch (err) {
     return res.json({ success: false, msg: err });

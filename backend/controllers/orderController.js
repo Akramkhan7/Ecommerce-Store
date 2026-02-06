@@ -156,7 +156,7 @@ const placeOrderRazorpay = async (req, res) => {
 
     await newOrder.save();
 
-    // 2️⃣ Razorpay order options
+    //  Razorpay order options
     const options = {
       amount: (amount + delivery_charges) * 100, // paisa
       currency: currency.toUpperCase(),
@@ -178,7 +178,7 @@ const placeOrderRazorpay = async (req, res) => {
 //verify Razorpay
 const verifyRazorPay = async(req, res) =>{
   try{
-     const razorpayInstance = getRazorpay();
+    const razorpayInstance = getRazorpay();
     const {userId, razorpay_order_id} = req.body;
     const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id);
     if(orderInfo.status === 'paid'){
@@ -198,7 +198,6 @@ const allOrders = async (req, res) => {
   try {
     const orders = await orderModel.find({});
     res.json({ success: true, orders });
-    console.log("orders are :", orders);
   } catch (error) {
     console.log(error);
     res.json({ success: false, msg: error.message });

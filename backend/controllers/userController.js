@@ -47,7 +47,6 @@ const loginUser = async (req, res) =>{
 
 const registerUser = async (req, res) =>{
     try{
-        console.log("in register")
         const {name , email, password} = req.body;
 
         const exists = await UserModel.findOne({email});
@@ -61,7 +60,7 @@ const registerUser = async (req, res) =>{
         }
 
         if(password.length < 8){
-              return res.json({success: false, msg : 'Plese enter a strong password'})
+              return res.json({success: false, msg : 'Please enter a strong password'})
         }
 
         const salt  = await bcrypt.genSalt(10);
@@ -74,8 +73,6 @@ const registerUser = async (req, res) =>{
         })
         const user  = await newUser.save();
         const token = createToken(user._id);
-        console.log(user)
-        console.log(token)
         return res.json({success : true,token})
 
     }catch(err){
