@@ -71,7 +71,7 @@ const Add = ({ token }) => {
       onSubmit={onSubmitHandler}
       className="flex flex-col w-full items-start gap-3"
     >
-      {/* Upload Images */}
+
       <div>
         <p className="mb-2">Upload Images</p>
         <div className="flex gap-2">
@@ -98,7 +98,7 @@ const Add = ({ token }) => {
         </div>
       </div>
 
-      {/* Product Name */}
+
       <div className="w-full">
         <p className="mb-2">Product Name</p>
         <input
